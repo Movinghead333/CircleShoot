@@ -266,7 +266,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7047989197597055870, guid: b68afb0bb836d4141bf2f53740195d1a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -327,7 +327,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7047989197597055870, guid: b68afb0bb836d4141bf2f53740195d1a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -471,7 +471,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7047989197597055870, guid: b68afb0bb836d4141bf2f53740195d1a, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8153463932882219422, guid: b68afb0bb836d4141bf2f53740195d1a, type: 3}
       propertyPath: endAngle
@@ -523,6 +523,7 @@ MonoBehaviour:
   allEnemies: []
   levelFinishedMenu: {fileID: 0}
   gameResetMenu: {fileID: 0}
+  gameFinishedMenu: {fileID: 0}
 --- !u!4 &1732787895
 Transform:
   m_ObjectHideFlags: 0
