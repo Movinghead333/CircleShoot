@@ -26,8 +26,21 @@ public class LevelManager : SingletonPersistent<LevelManager>
     public void ChangeState(GameState newState)
     {
         Debug.Log("Trasitioning from state " + gameState + " to state " + newState);
-        gameState = newState;
 
+        // We cannot complete a level if we died before.
+        if (gameState == GameState.Dead && newState == GameState.LevelFinished)
+        {
+            return;
+        }
+
+        // We cannot fail a level if we already completed it.
+        if (gameState  == GameState.LevelFinished && newState == GameState.Dead)
+        {
+            return;
+        }
+
+
+        gameState = newState;
 
         switch (newState)
         {
