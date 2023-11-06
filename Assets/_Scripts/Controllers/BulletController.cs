@@ -15,22 +15,22 @@ public class BulletController : MonoBehaviour
         GetComponent<Rigidbody2D>().velocity = bulletTransform.up * speed;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (((1 << collision.gameObject.layer) & collisionLayers.value) > 0)
         {
-            if (((1 << collision.collider.gameObject.layer) & LayerMask.GetMask("Player", "Enemies")) > 0)
+            if (((1 << collision.gameObject.layer) & LayerMask.GetMask("Player", "Enemies")) > 0)
             {
-                collision.collider.gameObject.SetActive(false);
+                collision.gameObject.SetActive(false);
 
-                if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Player") && collision.collider.gameObject.tag == "Player")
+                if (collision.gameObject.tag == "Player")
                 {
                     Debug.Log("Player hit");
-                    Debug.Log(collision.collider.name + " is colliding with " + collision.otherCollider.name);
+                    Debug.Log("Bullet is colliding with " + collision.gameObject.name);
                     LevelManager.Instance.ChangeState(GameState.Dead);
                 }
 
-                if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemies") && collision.collider.gameObject.tag == "Enemy")
+                if (collision.gameObject.tag == "Enemy")
                 {
                     LevelManager.Instance.CheckWinCondition();
                 }
