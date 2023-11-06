@@ -23,12 +23,14 @@ public class BulletController : MonoBehaviour
             {
                 collision.collider.gameObject.SetActive(false);
 
-                if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+                if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Player") && collision.collider.gameObject.tag == "Player")
                 {
+                    Debug.Log("Player hit");
+                    Debug.Log(collision.collider.name + " is colliding with " + collision.otherCollider.name);
                     LevelManager.Instance.ChangeState(GameState.Dead);
                 }
 
-                if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemies"))
+                if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Enemies") && collision.collider.gameObject.tag == "Enemy")
                 {
                     LevelManager.Instance.CheckWinCondition();
                 }

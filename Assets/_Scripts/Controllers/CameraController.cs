@@ -4,13 +4,9 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    private Transform playerTransform;
+    public Transform playerTransform { private get; set; }
     private Vector3 offset = new Vector3(0, 0, -10);
 
-    private void Start()
-    {
-        playerTransform = GameObject.Find("Player").transform;
-    }
 
     private void LateUpdate()
     {

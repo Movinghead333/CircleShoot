@@ -2,26 +2,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class StationaryEnemyController : MonoBehaviour
 {
-    public float startAngle = 45;
-    public float endAngle = 315;
-    public float turnSpeed = 5;
+    //[SerializeField]
+    private float startAngle = 0;
+    //[SerializeField]
+    private float endAngle = 0;
+    private float turnSpeed = 50;
 
-    public float currentAngle;
-    private bool turningUp = true;
+    [SerializeField]
+    private float absAngleRange;
+    private float currentAngle;
+    private bool turningClockwise = true;
 
     private GameObject bulletPrefab;
 
     private float shootingCooldown = 0.5f;
     private float currentShootingCooldown = 0;
 
+    public void Setup(Transform startAngleIndicator, Transform endAngleIndicator)
+    {
+        startAngle = startAngleIndicator.eulerAngles.z % 360;
+        endAngle = endAngleIndicator.eulerAngles.z % 360;
+
+        if (startAngle > endAngle)
+        {
+            absAngleRange = startAngle - endAngle;
+        }
+        else
+        {
+            absAngleRange = 360f - (endAngle - startAngle);
+        }
+
+        //Debug.Log("Start angle: " + startAngle + " End angle: " + endAngle + " Abs angle range: " + absAngleRange);
+
+        transform.rotation = Quaternion.Euler(0, 0, startAngle);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
-        currentAngle = startAngle;
-        transform.rotation = Quaternion.Euler(0, 0, currentAngle);
+
         LevelManager.Instance.RegisterEnemy(gameObject);
     }
 
@@ -32,33 +54,34 @@ public class EnemyController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (turningUp)
+        if (turningClockwise)
         {
-            if (currentAngle < endAngle)
+            if (currentAngle < absAngleRange)
             {
                 currentAngle += turnSpeed * Time.fixedDeltaTime;
-            } else
+            }
+            else
             {
-                currentAngle = endAngle;
-                turningUp = false;
+                currentAngle = absAngleRange;
+                turningClockwise = false;
             }
         }
         else
         {
-            if (currentAngle > startAngle)
+            if (currentAngle > 0)
             {
                 currentAngle -= turnSpeed * Time.fixedDeltaTime;
             }
             else
             {
-                currentAngle = startAngle;
-                turningUp = true;
+                currentAngle = 0;
+                turningClockwise = true;
             }
         }
 
-        currentAngle = (currentAngle + 360f) % 360f;
+        float angle = (startAngle - currentAngle) % 360;
 
-        transform.rotation = Quaternion.Euler(0, 0, currentAngle);
+        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     private void Shooting()
