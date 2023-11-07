@@ -13,7 +13,7 @@ public class LevelManager : SingletonPersistent<LevelManager>
     public GameObject gameResetMenu;
     public GameObject gameFinishedMenu;
 
-    private GameObject player;
+    public GameObject player;
     private PlayerController playerController;
 
     private string lastLevelSceneName = "Level2";
