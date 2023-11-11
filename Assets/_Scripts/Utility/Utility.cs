@@ -3,6 +3,20 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class Utility
 {
+    public static bool IsInFOVConeAndLineOfSightOptimized(
+        Vector3 sourcePosition,
+        Vector3 sourceDirection,
+        Vector3 targetPosition,
+        float detectionRange,
+        float fov
+    )
+    {
+        return IsInRange(sourcePosition, targetPosition, detectionRange) &&
+               IsInFOVCone(sourcePosition, sourceDirection, fov, targetPosition) &&
+               IsInLineOfSight(sourcePosition, targetPosition, LayerMask.GetMask("Environment"));
+       
+    }
+
     public static bool IsInRange(Vector3 sourcePosition, Vector3 targetPosition, float range)
     {
         return Vector3.Distance(sourcePosition, targetPosition) < range;
@@ -28,5 +42,16 @@ public class Utility
         }
 
         return raycastHit2D.collider == null;
+    }
+
+    public static Quaternion OrientationFromVector3(Vector3 directionVector)
+    {
+        float angle = Mathf.Atan2(-directionVector.x, directionVector.y) * Mathf.Rad2Deg;
+        return Quaternion.AngleAxis(angle, Vector3.forward);
+    }
+
+    public static Quaternion OrientationFromAngle(float angle)
+    {
+        return Quaternion.AngleAxis(angle, Vector3.forward);
     }
 }

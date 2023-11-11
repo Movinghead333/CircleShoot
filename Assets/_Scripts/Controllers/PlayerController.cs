@@ -30,8 +30,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Shooting();
-
-
     }
 
     private void FixedUpdate()
@@ -61,12 +59,13 @@ public class PlayerController : MonoBehaviour
             inputVector += new Vector3(1, 0, 0);
         }
 
+#if (GAMEPAD_USED)
         Vector2 gamepadLeftStickInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         if (gamepadLeftStickInput != Vector2.zero)
         {
             inputVector = gamepadLeftStickInput;
         }
-
+#endif
 
         inputVector.Normalize();
         transform.position += inputVector * speed * Time.deltaTime;

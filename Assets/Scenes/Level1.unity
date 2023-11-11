@@ -371,6 +371,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StationaryEnemySpawner (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 2643145952995178321, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2964676470702105113, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.8007314
@@ -581,6 +585,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StationaryEnemySpawner (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 2643145952995178321, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2964676470702105113, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.61840844
@@ -670,6 +678,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StationaryEnemySpawner (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 2643145952995178321, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2964676470702105113, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.03830073
@@ -736,6 +748,7 @@ MonoBehaviour:
   levelFinishedMenu: {fileID: 0}
   gameResetMenu: {fileID: 0}
   gameFinishedMenu: {fileID: 0}
+  player: {fileID: 0}
 --- !u!4 &1732787895
 Transform:
   m_ObjectHideFlags: 0
@@ -954,19 +967,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2964676470702105113, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5310289
+      value: 0.93019354
       objectReference: {fileID: 0}
     - target: {fileID: 2964676470702105113, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.8473537
+      value: -0.36706942
       objectReference: {fileID: 0}
     - target: {fileID: 2964676470702105113, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -115.85
+      value: -43.07
       objectReference: {fileID: 0}
     - target: {fileID: 3753606544668112265, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.04283461
+      value: -0.841982
       objectReference: {fileID: 0}
     - target: {fileID: 3753606544668112265, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.y
@@ -974,11 +987,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3753606544668112265, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.9990822
+      value: 0.5395057
       objectReference: {fileID: 0}
     - target: {fileID: 3753606544668112265, guid: 3dd5444381f80d84292434c6ffdef007, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 184.91
+      value: 294.7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -996,6 +1009,10 @@ PrefabInstance:
     - target: {fileID: 1756878784482091347, guid: b68040494f8ce2f44998b560b173f356, type: 3}
       propertyPath: m_Name
       value: Main Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 3867254024963322836, guid: b68040494f8ce2f44998b560b173f356, type: 3}
+      propertyPath: orthographic size
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5924610624614046418, guid: b68040494f8ce2f44998b560b173f356, type: 3}
       propertyPath: m_LocalPosition.x

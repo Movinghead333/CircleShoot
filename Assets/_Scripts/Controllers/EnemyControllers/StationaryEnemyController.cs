@@ -10,38 +10,35 @@ public class StationaryEnemyController : MonoBehaviour
     private float startAngle = 0;
     //[SerializeField]
     private float endAngle = 0;
-    private float turnSpeed = 50;
+    private float turnSpeed = 20;
 
     private float fov = 90;
-    private float detectionRange = 5f;
+    private float detectionRange = 50f;
 
-    [SerializeField]
-    private float absAngleRange;
-    private float currentAngle;
     private bool turningClockwise = true;
+
+    private Quaternion startOrientation;
+    private Quaternion endOrientation;
 
     private GameObject bulletPrefab;
 
     private float shootingCooldown = 0.5f;
     private float currentShootingCooldown = 0;
 
+    private AIState aiState = AIState.LookingForPlayer;
+
     public void Setup(Transform startAngleIndicator, Transform endAngleIndicator)
     {
         startAngle = startAngleIndicator.eulerAngles.z % 360;
+        startOrientation = Utility.OrientationFromAngle(startAngle);
         endAngle = endAngleIndicator.eulerAngles.z % 360;
+        endOrientation = Utility.OrientationFromAngle(endAngle);
 
-        if (startAngle > endAngle)
-        {
-            absAngleRange = startAngle - endAngle;
-        }
-        else
-        {
-            absAngleRange = 360f - (endAngle - startAngle);
-        }
+
 
         //Debug.Log("Start angle: " + startAngle + " End angle: " + endAngle + " Abs angle range: " + absAngleRange);
 
-        transform.rotation = Quaternion.Euler(0, 0, startAngle);
+        transform.rotation = startOrientation;
     }
 
     private void OnDrawGizmos()
@@ -99,58 +96,116 @@ public class StationaryEnemyController : MonoBehaviour
 
     private void Update()
     {
-        Shooting();
+        TickShootingCooldown();
 
-        
+        switch (aiState)
+        {
+            case AIState.LookingForPlayer:
+                LookingForPlayer();
+                break;
+            case AIState.TracingPlayer:
+                TracingPlayer();
+                break;
+            case AIState.ReturningToScanArea:
+                ReturningToScanArea();
+                break;
+        }
     }
 
-    private void FixedUpdate()
+    private void LookingForPlayer()
     {
+        Vector3 playerPosition = LevelManager.Instance.player.transform.position;
+        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position,transform.up, playerPosition, detectionRange, fov))
+        {
+            ChangeAIState(AIState.TracingPlayer);
+        }
+
         if (turningClockwise)
         {
-            if (currentAngle < absAngleRange)
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, endOrientation, turnSpeed * Time.fixedDeltaTime);
+            if (transform.rotation == endOrientation)
             {
-                currentAngle += turnSpeed * Time.fixedDeltaTime;
-            }
-            else
-            {
-                currentAngle = absAngleRange;
                 turningClockwise = false;
             }
         }
         else
         {
-            if (currentAngle > 0)
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, startOrientation, turnSpeed * Time.fixedDeltaTime);
+            if (transform.rotation == startOrientation)
             {
-                currentAngle -= turnSpeed * Time.fixedDeltaTime;
-            }
-            else
-            {
-                currentAngle = 0;
                 turningClockwise = true;
             }
         }
+    }
 
-        float angle = (startAngle - currentAngle) % 360;
+    private void TracingPlayer()
+    {
+        Vector3 playerPosition = LevelManager.Instance.player.transform.position;
+        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, detectionRange, fov))
+        {
+            Vector3 playerFacingDirection = playerPosition - transform.position;
+            Quaternion orientationTowardsPlayer = Utility.OrientationFromVector3(playerFacingDirection);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, orientationTowardsPlayer, turnSpeed * Time.fixedDeltaTime);
+            
+            Shooting();
+        }
+        else
+        {
+            ChangeAIState(AIState.ReturningToScanArea);
+        }
+    }
 
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+    private void ReturningToScanArea()
+    {
+        Vector3 playerPosition = LevelManager.Instance.player.transform.position;
+        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, detectionRange, fov))
+        {
+            ChangeAIState(AIState.TracingPlayer);
+        }
+
+        float angleTowardsStartOrientation = Quaternion.Angle(transform.rotation, startOrientation);
+        float angleTowardsEndOrientation = Quaternion.Angle(transform.rotation, endOrientation);
+
+        Quaternion targetOrientation = angleTowardsStartOrientation > angleTowardsEndOrientation ? endOrientation : startOrientation;
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetOrientation, turnSpeed * Time.fixedDeltaTime);
+
+        if (transform.rotation == targetOrientation)
+        {
+            ChangeAIState(AIState.LookingForPlayer);
+        }
+    }
+
+    private void ChangeAIState(AIState newState)
+    {
+        Debug.Log($"Changing from state {aiState} to state {newState}");
+        aiState = newState;
+
+        // Execute immediate state dependent changes here
     }
 
     private void Shooting()
     {
-        if (currentShootingCooldown > 0)
+        if (currentShootingCooldown == 0)
         {
-            currentShootingCooldown = Mathf.Clamp(currentShootingCooldown - Time.deltaTime, 0, shootingCooldown);
-        }
-        else
-        {
-            //GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
-            //bullet.layer = LayerMask.NameToLayer("Enemies");
-            //BulletController bulletController = bullet.GetComponent<BulletController>();
-            //bulletController.collisionLayers = LayerMask.GetMask("Environment", "Player");
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            bullet.layer = LayerMask.NameToLayer("Enemies");
+            BulletController bulletController = bullet.GetComponent<BulletController>();
+            bulletController.collisionLayers = LayerMask.GetMask("Environment", "Player");
 
             currentShootingCooldown = shootingCooldown;
         }
     }
 
+    private void TickShootingCooldown()
+    {
+        currentShootingCooldown = Mathf.Clamp(currentShootingCooldown - Time.deltaTime, 0, shootingCooldown);
+    }
+
+    private enum AIState
+    {
+        LookingForPlayer,
+        TracingPlayer,
+        ReturningToScanArea
+    }
 }
