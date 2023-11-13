@@ -6,7 +6,7 @@ public class LevelFinishedUIC : MonoBehaviour
 {
     private void Start()
     {
-        LevelManager.Instance.levelFinishedMenu = gameObject;
+        LevelManager.Instance.LevelFinishedMenu = gameObject;
     }
 
     public void ContinueToNextLevelButtonPressed()

@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class UICanvasUIC : MonoBehaviour
 {
-    public GameObject levelFinishedMenu;
-    public GameObject resetGameMenu;
-    public GameObject gameFinishedMenu;
+    public GameObject LevelFinishedMenu;
+    public GameObject ResetGameMenu;
+    public GameObject GameFinishedMenu;
 
     // Start is called before the first frame update
     void Start()
     {
-        LevelManager.Instance.levelFinishedMenu = levelFinishedMenu;
-        LevelManager.Instance.gameResetMenu = resetGameMenu;
-        LevelManager.Instance.gameFinishedMenu = gameFinishedMenu;
+        LevelManager.Instance.LevelFinishedMenu = LevelFinishedMenu;
+        LevelManager.Instance.GameResetMenu = ResetGameMenu;
+        LevelManager.Instance.GameFinishedMenu = GameFinishedMenu;
     }
 }

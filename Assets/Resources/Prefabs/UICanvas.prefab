@@ -961,9 +961,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4641e29d8a64494a908fd4cfb737b2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelFinishedMenu: {fileID: 4629218111855849361}
-  resetGameMenu: {fileID: 3216246113747345019}
-  gameFinishedMenu: {fileID: 5954154719796728326}
+  LevelFinishedMenu: {fileID: 4629218111855849361}
+  ResetGameMenu: {fileID: 3216246113747345019}
+  GameFinishedMenu: {fileID: 5954154719796728326}
 --- !u!1 &3216246113747345019
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,55 +1,47 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StationaryEnemyController : MonoBehaviour
 {
     [SerializeField] public bool DrawGismos = false;
 
-    //[SerializeField]
-    private float startAngle = 0;
-    //[SerializeField]
-    private float endAngle = 0;
-    private float turnSpeed = 20;
+    private float _startAngle = 0;
+    private float _endAngle = 0;
+    private float _turnSpeed = 15;
 
-    private float fov = 90;
-    private float detectionRange = 50f;
+    private float _fov = 45;
+    private float _detectionRange = 50f;
 
-    private bool turningClockwise = true;
+    private bool _turningClockwise = true;
 
-    private Quaternion startOrientation;
-    private Quaternion endOrientation;
+    private Quaternion _startOrientation;
+    private Quaternion _endOrientation;
 
-    private GameObject bulletPrefab;
+    private GameObject _bulletPrefab;
 
-    private float shootingCooldown = 0.5f;
-    private float currentShootingCooldown = 0;
+    private float _shootingCooldown = 0.5f;
+    private float _currentShootingCooldown = 0;
 
-    private AIState aiState = AIState.LookingForPlayer;
+    private AIState _aiState = AIState.LookingForPlayer;
 
     public void Setup(Transform startAngleIndicator, Transform endAngleIndicator)
     {
-        startAngle = startAngleIndicator.eulerAngles.z % 360;
-        startOrientation = Utility.OrientationFromAngle(startAngle);
-        endAngle = endAngleIndicator.eulerAngles.z % 360;
-        endOrientation = Utility.OrientationFromAngle(endAngle);
+        _startAngle = startAngleIndicator.eulerAngles.z % 360;
+        _startOrientation = Utility.OrientationFromAngle(_startAngle);
+        _endAngle = endAngleIndicator.eulerAngles.z % 360;
+        _endOrientation = Utility.OrientationFromAngle(_endAngle);
 
-
-
-        //Debug.Log("Start angle: " + startAngle + " End angle: " + endAngle + " Abs angle range: " + absAngleRange);
-
-        transform.rotation = startOrientation;
+        transform.rotation = _startOrientation;
     }
 
     private void OnDrawGizmos()
     {
-        Vector3 leftFOVLimit = transform.position + (Quaternion.Euler(0,0, fov/2f) * transform.up) * detectionRange;
-        Vector3 rightFOVLimit = transform.position + (Quaternion.Euler(0, 0, -fov / 2f) * transform.up) * detectionRange;
+        Vector3 leftFOVLimit = transform.position + (Quaternion.Euler(0,0, _fov/2f) * transform.up) * _detectionRange;
+        Vector3 rightFOVLimit = transform.position + (Quaternion.Euler(0, 0, -_fov / 2f) * transform.up) * _detectionRange;
 
 
         Gizmos.color = new Color(0f, 1f, 0f);
-        Vector3 playerPosition = LevelManager.Instance.player.transform.position;
-        bool playerIsInDetectionRange = Utility.IsInRange(transform.position, playerPosition, detectionRange);
+        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        bool playerIsInDetectionRange = Utility.IsInRange(transform.position, playerPosition, _detectionRange);
         if (playerIsInDetectionRange)
         {
             Gizmos.color = new Color(1f, 1f, 0f);
@@ -69,15 +61,15 @@ public class StationaryEnemyController : MonoBehaviour
         Gizmos.DrawLine(transform.position, leftFOVLimit);
         Gizmos.DrawLine(transform.position, rightFOVLimit);
 
-        float arcLength = detectionRange * 2f * Mathf.PI * (fov / 360f);
+        float arcLength = _detectionRange * 2f * Mathf.PI * (_fov / 360f);
         int arcSegments = (int)arcLength;
 
         Vector3 from = rightFOVLimit;
         Vector3 to;
         for (int i = 0; i < arcSegments; i++)
         {
-            float angleOffset = fov * ((float)(i+1) / (arcSegments+1));
-            to = transform.position + (Quaternion.Euler(0, 0, (-fov / 2f) + angleOffset) * transform.up) * detectionRange;
+            float angleOffset = _fov * ((float)(i+1) / (arcSegments+1));
+            to = transform.position + (Quaternion.Euler(0, 0, (-_fov / 2f) + angleOffset) * transform.up) * _detectionRange;
 
             Gizmos.DrawLine(from, to);
             from = to;
@@ -89,7 +81,7 @@ public class StationaryEnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
+        _bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
 
         LevelManager.Instance.RegisterEnemy(gameObject);
     }
@@ -98,7 +90,7 @@ public class StationaryEnemyController : MonoBehaviour
     {
         TickShootingCooldown();
 
-        switch (aiState)
+        switch (_aiState)
         {
             case AIState.LookingForPlayer:
                 LookingForPlayer();
@@ -114,38 +106,38 @@ public class StationaryEnemyController : MonoBehaviour
 
     private void LookingForPlayer()
     {
-        Vector3 playerPosition = LevelManager.Instance.player.transform.position;
-        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position,transform.up, playerPosition, detectionRange, fov))
+        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position,transform.up, playerPosition, _detectionRange, _fov))
         {
             ChangeAIState(AIState.TracingPlayer);
         }
 
-        if (turningClockwise)
+        if (_turningClockwise)
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, endOrientation, turnSpeed * Time.fixedDeltaTime);
-            if (transform.rotation == endOrientation)
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, _endOrientation, _turnSpeed * Time.fixedDeltaTime);
+            if (transform.rotation == _endOrientation)
             {
-                turningClockwise = false;
+                _turningClockwise = false;
             }
         }
         else
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, startOrientation, turnSpeed * Time.fixedDeltaTime);
-            if (transform.rotation == startOrientation)
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, _startOrientation, _turnSpeed * Time.fixedDeltaTime);
+            if (transform.rotation == _startOrientation)
             {
-                turningClockwise = true;
+                _turningClockwise = true;
             }
         }
     }
 
     private void TracingPlayer()
     {
-        Vector3 playerPosition = LevelManager.Instance.player.transform.position;
-        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, detectionRange, fov))
+        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, _detectionRange, _fov))
         {
             Vector3 playerFacingDirection = playerPosition - transform.position;
             Quaternion orientationTowardsPlayer = Utility.OrientationFromVector3(playerFacingDirection);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, orientationTowardsPlayer, turnSpeed * Time.fixedDeltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, orientationTowardsPlayer, _turnSpeed * Time.fixedDeltaTime);
             
             Shooting();
         }
@@ -157,18 +149,18 @@ public class StationaryEnemyController : MonoBehaviour
 
     private void ReturningToScanArea()
     {
-        Vector3 playerPosition = LevelManager.Instance.player.transform.position;
-        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, detectionRange, fov))
+        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, _detectionRange, _fov))
         {
             ChangeAIState(AIState.TracingPlayer);
         }
 
-        float angleTowardsStartOrientation = Quaternion.Angle(transform.rotation, startOrientation);
-        float angleTowardsEndOrientation = Quaternion.Angle(transform.rotation, endOrientation);
+        float angleTowardsStartOrientation = Quaternion.Angle(transform.rotation, _startOrientation);
+        float angleTowardsEndOrientation = Quaternion.Angle(transform.rotation, _endOrientation);
 
-        Quaternion targetOrientation = angleTowardsStartOrientation > angleTowardsEndOrientation ? endOrientation : startOrientation;
+        Quaternion targetOrientation = angleTowardsStartOrientation > angleTowardsEndOrientation ? _endOrientation : _startOrientation;
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetOrientation, turnSpeed * Time.fixedDeltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetOrientation, _turnSpeed * Time.fixedDeltaTime);
 
         if (transform.rotation == targetOrientation)
         {
@@ -178,28 +170,28 @@ public class StationaryEnemyController : MonoBehaviour
 
     private void ChangeAIState(AIState newState)
     {
-        Debug.Log($"Changing from state {aiState} to state {newState}");
-        aiState = newState;
+        Debug.Log($"Changing from state {_aiState} to state {newState}");
+        _aiState = newState;
 
         // Execute immediate state dependent changes here
     }
 
     private void Shooting()
     {
-        if (currentShootingCooldown == 0)
+        if (_currentShootingCooldown == 0)
         {
-            GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+            GameObject bullet = Instantiate(_bulletPrefab, transform.position, transform.rotation);
             bullet.layer = LayerMask.NameToLayer("Enemies");
             BulletController bulletController = bullet.GetComponent<BulletController>();
             bulletController.collisionLayers = LayerMask.GetMask("Environment", "Player");
 
-            currentShootingCooldown = shootingCooldown;
+            _currentShootingCooldown = _shootingCooldown;
         }
     }
 
     private void TickShootingCooldown()
     {
-        currentShootingCooldown = Mathf.Clamp(currentShootingCooldown - Time.deltaTime, 0, shootingCooldown);
+        _currentShootingCooldown = Mathf.Clamp(_currentShootingCooldown - Time.deltaTime, 0, _shootingCooldown);
     }
 
     private enum AIState

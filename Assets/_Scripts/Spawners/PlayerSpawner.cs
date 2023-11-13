@@ -10,7 +10,7 @@ public class PlayerSpawner : MonoBehaviour
         GameObject environment = GameObject.Find("Environment");
         GameObject playerGameObject = Instantiate(playerPrefab, transform.position, Quaternion.identity, environment.transform);
 
-        Camera.main.gameObject.GetComponent<CameraController>().playerTransform = playerGameObject.transform;
+        Camera.main.gameObject.GetComponent<CameraController>().PlayerTransform = playerGameObject.transform;
     }
 
     private void OnDrawGizmos()

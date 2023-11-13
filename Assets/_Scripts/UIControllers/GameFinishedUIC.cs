@@ -6,7 +6,7 @@ public class GameFinishedUIC : MonoBehaviour
 {
     private void Start()
     {
-        LevelManager.Instance.gameFinishedMenu = gameObject;
+        LevelManager.Instance.GameFinishedMenu = gameObject;
     }
 
     public void RestartGameButtonPressed()

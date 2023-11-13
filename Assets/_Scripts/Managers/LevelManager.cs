@@ -5,18 +5,18 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : SingletonPersistent<LevelManager>
 {
-    public GameState gameState { get; private set; }
+    public GameState GameState { get; private set; }
 
-    public List<GameObject> allEnemies = new List<GameObject>();
+    public List<GameObject> AllEnemies = new List<GameObject>();
 
-    public GameObject levelFinishedMenu;
-    public GameObject gameResetMenu;
-    public GameObject gameFinishedMenu;
+    public GameObject LevelFinishedMenu;
+    public GameObject GameResetMenu;
+    public GameObject GameFinishedMenu;
 
-    public GameObject player;
-    private PlayerController playerController;
+    public GameObject Player;
+    private PlayerController _playerController;
 
-    private string lastLevelSceneName = "Level2";
+    private string _lastLevelSceneName = "Level2";
 
     private void Start()
     {
@@ -25,47 +25,47 @@ public class LevelManager : SingletonPersistent<LevelManager>
 
     public void ChangeState(GameState newState)
     {
-        Debug.Log("Trasitioning from state " + gameState + " to state " + newState);
+        Debug.Log("Trasitioning from state " + GameState + " to state " + newState);
 
         // We cannot complete a level if we died before.
-        if (gameState == GameState.Dead && newState == GameState.LevelFinished)
+        if (GameState == GameState.Dead && newState == GameState.LevelFinished)
         {
             return;
         }
 
         // We cannot fail a level if we already completed it.
-        if (gameState  == GameState.LevelFinished && newState == GameState.Dead)
+        if (GameState  == GameState.LevelFinished && newState == GameState.Dead)
         {
             return;
         }
 
 
-        gameState = newState;
+        GameState = newState;
 
         switch (newState)
         {
             case GameState.Setup:
-                allEnemies.Clear();
+                AllEnemies.Clear();
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-                gameResetMenu.SetActive(false);
+                GameResetMenu.SetActive(false);
                 ChangeState(GameState.Playing);
                 break;
             case GameState.Playing:
                 break;
             case GameState.LevelFinished:
                 // Disable player controls when the level is won
-                playerController.enabled = false;
-                levelFinishedMenu.SetActive(true);
+                _playerController.enabled = false;
+                LevelFinishedMenu.SetActive(true);
                 break;
             case GameState.Dead:
-                gameResetMenu.SetActive(true);
+                GameResetMenu.SetActive(true);
                 break;
             case GameState.GoToNextLevel:
-                levelFinishedMenu.SetActive(false);
+                LevelFinishedMenu.SetActive(false);
 
-                allEnemies.Clear();
+                AllEnemies.Clear();
 
-                if (SceneManager.GetActiveScene().name == lastLevelSceneName)
+                if (SceneManager.GetActiveScene().name == _lastLevelSceneName)
                 {
                     ChangeState(GameState.GameCompleted);
                 }
@@ -77,10 +77,10 @@ public class LevelManager : SingletonPersistent<LevelManager>
                     
                 break;
             case GameState.GameCompleted:
-                gameFinishedMenu.SetActive(true);
+                GameFinishedMenu.SetActive(true);
                 break;
             case GameState.ExitGame:
-                gameFinishedMenu.SetActive(false);
+                GameFinishedMenu.SetActive(false);
                 Debug.Log("Quitting game");
                 Application.Quit();
                 break;
@@ -93,20 +93,20 @@ public class LevelManager : SingletonPersistent<LevelManager>
 
     public void RegisterPlayer(GameObject playerGameobject)
     {
-        player = playerGameobject;
-        playerController = player.GetComponent<PlayerController>();
+        Player = playerGameobject;
+        _playerController = Player.GetComponent<PlayerController>();
     }
 
     public void RegisterEnemy(GameObject enemyGameobject)
     {
-        allEnemies.Add(enemyGameobject);
+        AllEnemies.Add(enemyGameobject);
     }
 
     public void CheckWinCondition()
     {
         bool enemiesRemaining = false;
 
-        foreach (GameObject go in allEnemies)
+        foreach (GameObject go in AllEnemies)
         {
             enemiesRemaining |= go.activeSelf;
         }

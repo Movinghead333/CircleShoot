@@ -7,7 +7,7 @@ public class ResetGameUIC : MonoBehaviour
     private void Start()
     {
         Debug.Log("resetgameuic");
-        LevelManager.Instance.gameResetMenu = gameObject;
+        LevelManager.Instance.GameResetMenu = gameObject;
     }
 
     public void GameResetButtonPressed()

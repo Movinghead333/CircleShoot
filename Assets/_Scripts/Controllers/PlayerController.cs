@@ -1,28 +1,24 @@
 #define NO_GAMEPAD_USED
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-
 
 public class PlayerController : MonoBehaviour
 {
-    private float speed = 10f;
+    private float _speed = 10f;
 
-    private float shootingCooldown = 0.5f;
-    private float currentShootingCooldown = 0;
+    private float _shootingCooldown = 0.5f;
+    private float _currentShootingCooldown = 0;
 
-    private GameObject bulletPrefab;
+    private GameObject _bulletPrefab;
 
 #if (GAMEPAD_USED)
-    Vector3 lookDirection = Vector3.up;
+    private Vector3 _lookDirection = Vector3.up;
 #endif
 
     // Start is called before the first frame update
     void Start()
     {
-        bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
+        _bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
         LevelManager.Instance.RegisterPlayer(gameObject);
     }
 
@@ -68,7 +64,7 @@ public class PlayerController : MonoBehaviour
 #endif
 
         inputVector.Normalize();
-        transform.position += inputVector * speed * Time.deltaTime;
+        transform.position += inputVector * _speed * Time.deltaTime;
     }
 
     private void RotatePlayer()
@@ -79,33 +75,33 @@ public class PlayerController : MonoBehaviour
 
         if (gamepadRightStickInput.magnitude > 0.02)
         {
-            lookDirection = gamepadRightStickInput.normalized;
+            _lookDirection = gamepadRightStickInput.normalized;
         }
 #else
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0;
 
-        Vector3 lookDirection = mouseWorldPos - transform.position;
+        Vector3 _lookDirection = mouseWorldPos - transform.position;
 #endif
-        float angle = Mathf.Atan2(-lookDirection.x, lookDirection.y) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(-_lookDirection.x, _lookDirection.y) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     private void Shooting()
     {
-        if (currentShootingCooldown > 0)
+        if (_currentShootingCooldown > 0)
         {
-            currentShootingCooldown = Mathf.Clamp(currentShootingCooldown - Time.deltaTime, 0, shootingCooldown);
+            _currentShootingCooldown = Mathf.Clamp(_currentShootingCooldown - Time.deltaTime, 0, _shootingCooldown);
         }
         else
         {
             if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.JoystickButton5)) {
-                GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+                GameObject bullet = Instantiate(_bulletPrefab, transform.position, transform.rotation);
                 bullet.layer = LayerMask.NameToLayer("Player");
                 BulletController bulletController = bullet.GetComponent<BulletController>();
                 bulletController.collisionLayers = LayerMask.GetMask("Environment", "Enemies");
 
-                currentShootingCooldown = shootingCooldown;
+                _currentShootingCooldown = _shootingCooldown;
             }
         }
     }
