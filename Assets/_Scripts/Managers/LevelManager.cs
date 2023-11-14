@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,22 +6,19 @@ public class LevelManager : SingletonPersistent<LevelManager>
 {
     public GameState GameState { get; private set; }
 
-    public List<GameObject> AllEnemies = new List<GameObject>();
+    public static event Action<GameState> OnGameStateChanged;
 
-    public GameObject LevelFinishedMenu;
-    public GameObject GameResetMenu;
-    public GameObject GameFinishedMenu;
+    private int _currentSceneIndex = 0;
 
-    public GameObject Player;
-    private PlayerController _playerController;
-
-    private string _lastLevelSceneName = "Level2";
+    private const int _firstLevelIndex = 0;
+    private const int _lastLevelSceneIndex = 1;
 
     private void Start()
     {
+        Debug.Log($"Final level index: {_lastLevelSceneIndex}");
         ChangeState(GameState.Playing);
     }
-
+    
     public void ChangeState(GameState newState)
     {
         Debug.Log("Trasitioning from state " + GameState + " to state " + newState);
@@ -39,74 +35,39 @@ public class LevelManager : SingletonPersistent<LevelManager>
             return;
         }
 
-
         GameState = newState;
 
         switch (newState)
         {
             case GameState.Setup:
-                AllEnemies.Clear();
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-                GameResetMenu.SetActive(false);
-                ChangeState(GameState.Playing);
+                Setup();
                 break;
             case GameState.Playing:
                 break;
             case GameState.LevelFinished:
-                // Disable player controls when the level is won
-                _playerController.enabled = false;
-                LevelFinishedMenu.SetActive(true);
                 break;
             case GameState.Dead:
-                GameResetMenu.SetActive(true);
                 break;
             case GameState.GoToNextLevel:
-                LevelFinishedMenu.SetActive(false);
-
-                AllEnemies.Clear();
-
-                if (SceneManager.GetActiveScene().name == _lastLevelSceneName)
-                {
-                    ChangeState(GameState.GameCompleted);
-                }
-                else
-                {
-                    SceneManager.LoadScene("Level2");
-                    ChangeState(GameState.Playing);
-                }
-                    
+                GoToNextLevel();                 
                 break;
             case GameState.GameCompleted:
-                GameFinishedMenu.SetActive(true);
                 break;
             case GameState.ExitGame:
-                GameFinishedMenu.SetActive(false);
-                Debug.Log("Quitting game");
-                Application.Quit();
+                ExitGame();
                 break;
             case GameState.RestartGame:
-                Debug.Log("Restarting game");
-                SceneManager.LoadScene("Level1");
+                RestartGame();
                 break;
-;        }
-    }
+;       }
 
-    public void RegisterPlayer(GameObject playerGameobject)
-    {
-        Player = playerGameobject;
-        _playerController = Player.GetComponent<PlayerController>();
+        OnGameStateChanged?.Invoke(newState);
     }
-
-    public void RegisterEnemy(GameObject enemyGameobject)
-    {
-        AllEnemies.Add(enemyGameobject);
-    }
-
     public void CheckWinCondition()
     {
         bool enemiesRemaining = false;
 
-        foreach (GameObject go in AllEnemies)
+        foreach (GameObject go in UnitManager.Instance.AllEnemies)
         {
             enemiesRemaining |= go.activeSelf;
         }
@@ -115,6 +76,44 @@ public class LevelManager : SingletonPersistent<LevelManager>
         {
             ChangeState(GameState.LevelFinished);
         }
+    }
+
+    private void Setup()
+    {
+        SceneManager.LoadScene(_currentSceneIndex);
+        
+        ChangeState(GameState.Playing);
+    }
+
+    private void GoToNextLevel()
+    {
+        UnitManager.Instance.Clear();
+
+        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+
+        Debug.Log($"Scene index: {nextSceneIndex}");
+
+        if (nextSceneIndex > _lastLevelSceneIndex)
+        {
+            ChangeState(GameState.GameCompleted);
+        }
+        else
+        {
+            _currentSceneIndex = nextSceneIndex;
+            ChangeState(GameState.Setup);
+        }
+    }
+
+    private void ExitGame()
+    {
+        Debug.Log("Quitting game");
+        Application.Quit();
+    }
+
+    private void RestartGame()
+    {
+        Debug.Log("Restarting game");
+        SceneManager.LoadScene(_firstLevelIndex);
     }
 }
 

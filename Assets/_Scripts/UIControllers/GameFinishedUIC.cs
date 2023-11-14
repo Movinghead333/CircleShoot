@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class GameFinishedUIC : MonoBehaviour
 {
-    private void Start()
-    {
-        LevelManager.Instance.GameFinishedMenu = gameObject;
-    }
-
     public void RestartGameButtonPressed()
     {
         LevelManager.Instance.ChangeState(GameState.RestartGame);

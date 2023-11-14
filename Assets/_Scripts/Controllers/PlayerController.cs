@@ -19,7 +19,13 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
-        LevelManager.Instance.RegisterPlayer(gameObject);
+        UnitManager.Instance.RegisterPlayer(gameObject);
+        LevelManager.OnGameStateChanged += GameManager_OnGameStateChanged;
+    }
+
+    private void OnDestroy()
+    {
+        LevelManager.OnGameStateChanged -= GameManager_OnGameStateChanged;
     }
 
     // Update is called once per frame
@@ -114,4 +120,12 @@ public class PlayerController : MonoBehaviour
      * 5-AX -> R2
      * 6-AX -> R-Stick Y
      */
+
+    private void GameManager_OnGameStateChanged(GameState state)
+    {
+        if (state == GameState.LevelFinished)
+        {
+            enabled = false;
+        }
+    }
 }

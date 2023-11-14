@@ -33,6 +33,14 @@ public class StationaryEnemyController : MonoBehaviour
         transform.rotation = _startOrientation;
     }
 
+    // Start is called before the first frame update
+    void Start()
+    {
+        _bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
+
+        UnitManager.Instance.RegisterEnemy(gameObject);
+    }
+
     private void OnDrawGizmos()
     {
         Vector3 leftFOVLimit = transform.position + (Quaternion.Euler(0,0, _fov/2f) * transform.up) * _detectionRange;
@@ -40,7 +48,7 @@ public class StationaryEnemyController : MonoBehaviour
 
 
         Gizmos.color = new Color(0f, 1f, 0f);
-        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        Vector3 playerPosition = UnitManager.Instance.Player.transform.position;
         bool playerIsInDetectionRange = Utility.IsInRange(transform.position, playerPosition, _detectionRange);
         if (playerIsInDetectionRange)
         {
@@ -78,14 +86,6 @@ public class StationaryEnemyController : MonoBehaviour
         Gizmos.DrawLine(from, leftFOVLimit);
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        _bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
-
-        LevelManager.Instance.RegisterEnemy(gameObject);
-    }
-
     private void Update()
     {
         TickShootingCooldown();
@@ -106,7 +106,7 @@ public class StationaryEnemyController : MonoBehaviour
 
     private void LookingForPlayer()
     {
-        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        Vector3 playerPosition = UnitManager.Instance.Player.transform.position;
         if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position,transform.up, playerPosition, _detectionRange, _fov))
         {
             ChangeAIState(AIState.TracingPlayer);
@@ -132,7 +132,7 @@ public class StationaryEnemyController : MonoBehaviour
 
     private void TracingPlayer()
     {
-        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        Vector3 playerPosition = UnitManager.Instance.Player.transform.position;
         if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, _detectionRange, _fov))
         {
             Vector3 playerFacingDirection = playerPosition - transform.position;
@@ -149,7 +149,7 @@ public class StationaryEnemyController : MonoBehaviour
 
     private void ReturningToScanArea()
     {
-        Vector3 playerPosition = LevelManager.Instance.Player.transform.position;
+        Vector3 playerPosition = UnitManager.Instance.Player.transform.position;
         if (Utility.IsInFOVConeAndLineOfSightOptimized(transform.position, transform.up, playerPosition, _detectionRange, _fov))
         {
             ChangeAIState(AIState.TracingPlayer);
